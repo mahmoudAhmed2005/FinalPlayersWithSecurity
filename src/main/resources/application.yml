@@ -1,0 +1,28 @@
+spring:
+  security:
+    user:
+      name: mahmoud
+      password: 123
+
+  application:
+    name: first_springBoot
+
+  datasource:
+    driver-class-name: oracle.jdbc.OracleDriver
+    url: jdbc:oracle:thin:@//localhost:1521/orclpdb
+    username: hr
+    password: hr
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  messages:
+    basename: i18n/message
+
+token:
+  secret: Mahm@123987@mahm@0987654321@rrrrrrrrrmmmmmmm
+  time: 2m
+
+

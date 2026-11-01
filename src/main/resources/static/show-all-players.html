@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Show All Players</title>
+
+
+    <!-- CSS داخل نفس الملف -->
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        body {
+            min-height: 100vh;
+
+            font-family: Arial, sans-serif;
+
+            background-color: #f1f5f9;
+
+            padding: 30px 20px;
+        }
+
+
+        .page-container {
+            width: 100%;
+            max-width: 1100px;
+
+            margin: auto;
+        }
+
+
+        .players-card {
+            background-color: white;
+
+            padding: 30px;
+
+            border-radius: 12px;
+
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+
+        .players-card h1 {
+            color: #1e293b;
+
+            text-align: center;
+
+            margin-bottom: 10px;
+        }
+
+
+        .page-description {
+            color: #64748b;
+
+            text-align: center;
+
+            margin-bottom: 25px;
+        }
+
+
+        .refresh-button {
+            padding: 11px 20px;
+
+            background-color: #2563eb;
+            color: white;
+
+            font-size: 15px;
+            font-weight: bold;
+
+            border: none;
+            border-radius: 6px;
+
+            cursor: pointer;
+
+            margin-bottom: 20px;
+        }
+
+
+        .refresh-button:hover {
+            background-color: #1d4ed8;
+        }
+
+
+        .refresh-button:disabled {
+            background-color: #94a3b8;
+
+            cursor: not-allowed;
+        }
+
+
+        .table-container {
+            width: 100%;
+
+            overflow-x: auto;
+        }
+
+
+        table {
+            width: 100%;
+
+            border-collapse: collapse;
+
+            text-align: center;
+        }
+
+
+        thead {
+            background-color: #1e293b;
+
+            color: white;
+        }
+
+
+        th,
+        td {
+            padding: 14px;
+
+            border: 1px solid #cbd5e1;
+        }
+
+
+        tbody tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+
+        tbody tr:hover {
+            background-color: #e2e8f0;
+        }
+
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+
+            gap: 8px;
+        }
+
+
+        .action-button {
+            padding: 8px 13px;
+
+            color: white;
+
+            font-weight: bold;
+
+            border: none;
+            border-radius: 5px;
+
+            cursor: pointer;
+        }
+
+
+        .update-button {
+            background-color: #f59e0b;
+        }
+
+
+        .update-button:hover {
+            background-color: #d97706;
+        }
+
+
+        .delete-button {
+            background-color: #dc2626;
+        }
+
+
+        .delete-button:hover {
+            background-color: #b91c1c;
+        }
+
+
+        .message {
+            min-height: 24px;
+
+            text-align: center;
+
+            font-weight: bold;
+
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+
+
+        .success-message {
+            color: #16a34a;
+        }
+
+
+        .error-message {
+            color: #dc2626;
+        }
+
+
+        .loading-message {
+            color: #2563eb;
+        }
+
+
+        .empty-table-message {
+            color: #64748b;
+
+            font-weight: bold;
+        }
+
+
+        .back-link {
+            display: block;
+
+            text-align: center;
+
+            color: #2563eb;
+
+            text-decoration: none;
+
+            margin-top: 10px;
+        }
+
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+
+        @media (max-width: 700px) {
+
+            .players-card {
+                padding: 20px 12px;
+            }
+
+
+            th,
+            td {
+                padding: 10px 7px;
+
+                font-size: 14px;
+            }
+
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<main class="page-container">
+
+    <section class="players-card">
+
+        <h1>All Players</h1>
+
+        <p class="page-description">
+            View and manage all registered players
+        </p>
+
+
+        <button
+                type="button"
+                id="refreshButton"
+                class="refresh-button"
+        >
+            Refresh Players
+        </button>
+
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Number</th>
+                    <th>Salary</th>
+                    <th>Actions</th>
+                </tr>
+
+                </thead>
+
+
+                <tbody id="playersTableBody">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <p id="message" class="message"></p>
+
+
+        <a href="/main.html" class="back-link">
+            Back To Main Page
+        </a>
+
+    </section>
+
+</main>
+
+
+<!-- JavaScript داخل نفس الملف -->
+<script>
+
+    const playersTableBody =
+        document.getElementById("playersTableBody");
+
+    const refreshButton =
+        document.getElementById("refreshButton");
+
+    const message =
+        document.getElementById("message");
+
+
+    /*
+       جلب اللاعبين عند فتح الصفحة.
+    */
+    loadPlayers();
+
+
+    /*
+       عند الضغط على Refresh Players
+       سيتم جلب اللاعبين مرة أخرى.
+    */
+    refreshButton.addEventListener(
+        "click",
+        function () {
+
+            loadPlayers();
+
+        }
+    );
+
+
+    /*
+       Function مسؤولة عن جلب جميع اللاعبين.
+    */
+    async function loadPlayers() {
+
+        /*
+           مسح بيانات الجدول القديمة.
+        */
+        playersTableBody.innerHTML = "";
+
+
+        message.textContent = "Loading players...";
+
+        message.className =
+            "message loading-message";
+
+
+        refreshButton.disabled = true;
+
+        refreshButton.textContent = "Loading...";
+
+
+        try {
+
+            /*
+               إرسال GET Request إلى Spring Boot.
+            */
+            const response = await fetch("/players");
+
+
+            if (!response.ok) {
+
+                throw new Error("Failed to load players");
+
+            }
+
+
+            /*
+               تحويل JSON إلى JavaScript Array.
+            */
+            const players = await response.json();
+
+
+            /*
+               إذا لم يوجد أي لاعب.
+            */
+            if (players.length === 0) {
+
+                showEmptyTable();
+
+                message.textContent =
+                    "No players found";
+
+
+                message.className =
+                    "message error-message";
+
+
+                return;
+
+            }
+
+
+            /*
+               عرض كل لاعب داخل الجدول.
+            */
+            players.forEach(function (player) {
+
+                addPlayerToTable(player);
+
+            });
+
+
+            message.textContent =
+                players.length + " player(s) found";
+
+
+            message.className =
+                "message success-message";
+
+        } catch (error) {
+
+            showEmptyTable();
+
+
+            message.textContent =
+                "Error: " + error.message;
+
+
+            message.className =
+                "message error-message";
+
+        } finally {
+
+            refreshButton.disabled = false;
+
+            refreshButton.textContent =
+                "Refresh Players";
+
+        }
+
+    }
+
+
+    /*
+       Function تضيف لاعبًا واحدًا إلى الجدول.
+    */
+    function addPlayerToTable(player) {
+
+        const row =
+            document.createElement("tr");
+
+
+        const idCell =
+            document.createElement("td");
+
+        idCell.textContent = player.id;
+
+
+        const nameCell =
+            document.createElement("td");
+
+        nameCell.textContent = player.name;
+
+
+        const numberCell =
+            document.createElement("td");
+
+        numberCell.textContent = player.number;
+
+
+        const salaryCell =
+            document.createElement("td");
+
+        salaryCell.textContent =
+            Number(player.salary).toFixed(2);
+
+
+        const actionsCell =
+            document.createElement("td");
+
+
+        const actionButtons =
+            document.createElement("div");
+
+        actionButtons.className =
+            "action-buttons";
+
+
+        /*
+           إنشاء زر Update.
+        */
+        const updateButton =
+            document.createElement("button");
+
+        updateButton.type = "button";
+
+        updateButton.textContent = "Update";
+
+        updateButton.className =
+            "action-button update-button";
+
+
+        /*
+           عند الضغط على Update،
+           يتم فتح صفحة التعديل وإرسال ID في الرابط.
+
+           مثال:
+           /update-player.html?id=5
+        */
+        updateButton.addEventListener(
+            "click",
+            function () {
+
+                window.location.href =
+                    "/update-player.html?id=" + player.id;
+
+            }
+        );
+
+
+        /*
+           إنشاء زر Delete.
+        */
+        const deleteButton =
+            document.createElement("button");
+
+        deleteButton.type = "button";
+
+        deleteButton.textContent = "Delete";
+
+        deleteButton.className =
+            "action-button delete-button";
+
+
+        deleteButton.addEventListener(
+            "click",
+            function () {
+
+                deletePlayer(
+                    player.id,
+                    player.name
+                );
+
+            }
+        );
+
+
+        actionButtons.appendChild(updateButton);
+
+        actionButtons.appendChild(deleteButton);
+
+        actionsCell.appendChild(actionButtons);
+
+
+        row.appendChild(idCell);
+
+        row.appendChild(nameCell);
+
+        row.appendChild(numberCell);
+
+        row.appendChild(salaryCell);
+
+        row.appendChild(actionsCell);
+
+
+        playersTableBody.appendChild(row);
+
+    }
+
+
+    /*
+       Function مسؤولة عن حذف اللاعب.
+    */
+    async function deletePlayer(playerId, playerName) {
+
+        const confirmDelete = confirm(
+            "Are you sure you want to delete "
+            + playerName
+            + "?"
+        );
+
+
+        if (!confirmDelete) {
+
+            return;
+
+        }
+
+
+        message.textContent = "Deleting player...";
+
+        message.className =
+            "message loading-message";
+
+
+        try {
+
+            /*
+               إرسال DELETE Request.
+
+               مثال:
+               DELETE /players/5
+            */
+            const response = await fetch(
+                "/players/" + playerId,
+                {
+                    method: "DELETE"
+                }
+            );
+
+
+            if (!response.ok) {
+
+                const errorText =
+                    await response.text();
+
+
+                throw new Error(
+                    errorText || "Failed to delete player"
+                );
+
+            }
+
+
+            message.textContent =
+                "Player deleted successfully";
+
+
+            message.className =
+                "message success-message";
+
+
+            /*
+               تحديث الجدول بعد نجاح الحذف.
+            */
+            await loadPlayers();
+
+        } catch (error) {
+
+            message.textContent =
+                "Error: " + error.message;
+
+
+            message.className =
+                "message error-message";
+
+        }
+
+    }
+
+
+    /*
+       عرض صف داخل الجدول عندما لا توجد بيانات.
+    */
+    function showEmptyTable() {
+
+        playersTableBody.innerHTML = "";
+
+
+        const row =
+            document.createElement("tr");
+
+
+        const cell =
+            document.createElement("td");
+
+
+        cell.colSpan = 5;
+
+        cell.textContent = "No players available";
+
+        cell.className =
+            "empty-table-message";
+
+
+        row.appendChild(cell);
+
+        playersTableBody.appendChild(row);
+
+    }
+
+</script>
+
+</body>
+
+</html>

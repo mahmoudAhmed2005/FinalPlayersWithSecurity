@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Player Management</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        body {
+            min-height: 100vh;
+
+            font-family: Arial, sans-serif;
+
+            background:
+                    linear-gradient(
+                            135deg,
+                            #e0e7ff,
+                            #f8fafc,
+                            #dcfce7
+                    );
+
+            color: #1e293b;
+        }
+
+
+        .page-container {
+            width: 100%;
+            max-width: 1300px;
+
+            margin: auto;
+
+            padding: 60px 30px;
+        }
+
+
+        /* عنوان الصفحة */
+
+        .page-header {
+            text-align: center;
+
+            margin-bottom: 45px;
+        }
+
+
+        .page-header h1 {
+            color: #0f172a;
+
+            font-size: 38px;
+
+            margin-bottom: 12px;
+        }
+
+
+        .page-description {
+            color: #64748b;
+
+            font-size: 18px;
+        }
+
+
+        /* حاوية الكروت */
+
+        .cards-container {
+            display: grid;
+
+            grid-template-columns:
+                    repeat(4, 1fr);
+
+            gap: 22px;
+        }
+
+
+        /* تصميم الكارت */
+
+        .management-card {
+            min-height: 310px;
+
+            background-color: white;
+
+            padding: 30px 22px;
+
+            border-radius: 16px;
+
+            box-shadow:
+                    0 10px 30px
+                    rgba(15, 23, 42, 0.1);
+
+            text-align: center;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            transition:
+                    transform 0.3s,
+                    box-shadow 0.3s;
+        }
+
+
+        .management-card:hover {
+            transform: translateY(-8px);
+
+            box-shadow:
+                    0 18px 40px
+                    rgba(15, 23, 42, 0.18);
+        }
+
+
+        /* الأيقونة */
+
+        .card-icon {
+            width: 80px;
+            height: 80px;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            font-size: 38px;
+
+            border-radius: 50%;
+
+            margin-bottom: 22px;
+        }
+
+
+        .show-icon {
+            color: #2563eb;
+
+            background-color: #dbeafe;
+        }
+
+
+        .delete-icon {
+            color: #dc2626;
+
+            background-color: #fee2e2;
+        }
+
+
+        .update-icon {
+            color: #d97706;
+
+            background-color: #fef3c7;
+        }
+
+
+        .add-icon {
+            color: #16a34a;
+
+            background-color: #dcfce7;
+        }
+
+
+        /* محتويات الكارت */
+
+        .management-card h2 {
+            font-size: 21px;
+
+            margin-bottom: 12px;
+        }
+
+
+        .card-description {
+            color: #64748b;
+
+            font-size: 14px;
+
+            line-height: 1.6;
+
+            margin-bottom: 25px;
+        }
+
+
+        /* الأزرار */
+
+        .management-button {
+            width: 100%;
+
+            padding: 12px;
+
+            color: white;
+
+            font-size: 15px;
+            font-weight: bold;
+
+            border: none;
+            border-radius: 7px;
+
+            cursor: pointer;
+
+            margin-top: auto;
+
+            transition:
+                    transform 0.2s,
+                    opacity 0.2s;
+        }
+
+
+        .management-button:hover {
+            transform: scale(1.03);
+
+            opacity: 0.9;
+        }
+
+
+        .show-button {
+            background-color: #2563eb;
+        }
+
+
+        .delete-button {
+            background-color: #dc2626;
+        }
+
+
+        .update-button {
+            background-color: #f59e0b;
+        }
+
+
+        .add-button {
+            background-color: #16a34a;
+        }
+
+
+        /* التابلت */
+
+        @media (max-width: 1000px) {
+
+            .cards-container {
+                grid-template-columns:
+                        repeat(2, 1fr);
+            }
+
+        }
+
+
+        /* الموبايل */
+
+        @media (max-width: 600px) {
+
+            .page-container {
+                padding: 35px 18px;
+            }
+
+
+            .page-header h1 {
+                font-size: 28px;
+            }
+
+
+            .page-description {
+                font-size: 16px;
+            }
+
+
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+
+
+            .management-card {
+                min-height: 280px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<main class="page-container">
+
+    <header class="page-header">
+
+        <h1>Player Management System</h1>
+
+        <p class="page-description">
+            Manage your players easily from one place
+        </p>
+
+    </header>
+
+
+    <section class="cards-container">
+
+
+        <!-- كارت عرض اللاعبين -->
+
+        <article class="management-card">
+
+            <div class="card-icon show-icon">
+                👥
+            </div>
+
+
+            <h2>Show Players</h2>
+
+
+            <p class="card-description">
+                View all registered players and
+                see their complete information.
+            </p>
+
+
+            <button
+                    type="button"
+                    class="management-button show-button"
+                    data-page="/show-all-players.html"
+            >
+                Show All Players
+            </button>
+
+        </article>
+
+
+        <!-- كارت حذف لاعب -->
+
+        <article class="management-card">
+
+            <div class="card-icon delete-icon">
+                🗑
+            </div>
+
+
+            <h2>Delete Player</h2>
+
+
+            <p class="card-description">
+                Select an existing player and
+                remove the player from the system.
+            </p>
+
+
+            <button
+                    type="button"
+                    class="management-button delete-button"
+                    data-page="/delete-player.html"
+            >
+                Delete Player
+            </button>
+
+        </article>
+
+
+        <!-- كارت تعديل لاعب -->
+
+        <article class="management-card">
+
+            <div class="card-icon update-icon">
+                ✏️
+            </div>
+
+
+            <h2>Update Player</h2>
+
+
+            <p class="card-description">
+                Select a player and update the name,
+                number or salary information.
+            </p>
+
+
+            <button
+                    type="button"
+                    class="management-button update-button"
+                    data-page="/update-player.html"
+            >
+                Update Player
+            </button>
+
+        </article>
+
+
+        <!-- كارت إضافة لاعب -->
+
+        <article class="management-card">
+
+            <div class="card-icon add-icon">
+                ➕
+            </div>
+
+
+            <h2>Add Player</h2>
+
+
+            <p class="card-description">
+                Create a new player and save the
+                player information in the system.
+            </p>
+
+
+            <button
+                    type="button"
+                    class="management-button add-button"
+                    data-page="/add-player.html"
+            >
+                Add Player
+            </button>
+
+        </article>
+
+    </section>
+
+</main>
+
+
+<script>
+
+    /*
+       الحصول على جميع أزرار العمليات.
+    */
+    const managementButtons =
+        document.querySelectorAll(".management-button");
+
+
+    /*
+       المرور على كل زر.
+    */
+    managementButtons.forEach(function (button) {
+
+        button.addEventListener("click", function () {
+
+            /*
+               الحصول على رابط الصفحة
+               من data-page.
+            */
+            const pageUrl =
+                button.getAttribute("data-page");
+
+
+            /*
+               الانتقال إلى الصفحة المطلوبة.
+            */
+            window.location.href = pageUrl;
+
+        });
+
+    });
+
+</script>
+
+</body>
+
+</html>
