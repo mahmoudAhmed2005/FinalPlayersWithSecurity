@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Delete Player</title>
+
+
+    <!-- CSS داخل نفس الملف -->
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        body {
+            min-height: 100vh;
+
+            font-family: Arial, sans-serif;
+
+            background-color: #f1f5f9;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+
+        .page-container {
+            width: 100%;
+
+            display: flex;
+            justify-content: center;
+
+            padding: 20px;
+        }
+
+
+        .player-card {
+            width: 100%;
+            max-width: 450px;
+
+            background-color: white;
+
+            padding: 35px;
+
+            border-radius: 12px;
+
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+
+        .player-card h1 {
+            text-align: center;
+
+            color: #1e293b;
+
+            margin-bottom: 10px;
+        }
+
+
+        .page-description {
+            text-align: center;
+
+            color: #64748b;
+
+            margin-bottom: 30px;
+        }
+
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+
+        .form-group label {
+            display: block;
+
+            color: #334155;
+
+            font-weight: bold;
+
+            margin-bottom: 8px;
+        }
+
+
+        .form-group select {
+            width: 100%;
+
+            padding: 12px;
+
+            font-size: 16px;
+
+            background-color: white;
+
+            border: 1px solid #cbd5e1;
+
+            border-radius: 6px;
+
+            outline: none;
+
+            cursor: pointer;
+        }
+
+
+        .form-group select:focus {
+            border-color: #dc2626;
+
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+        }
+
+
+        .delete-button {
+            width: 100%;
+
+            padding: 13px;
+
+            background-color: #dc2626;
+            color: white;
+
+            font-size: 16px;
+            font-weight: bold;
+
+            border: none;
+            border-radius: 6px;
+
+            cursor: pointer;
+        }
+
+
+        .delete-button:hover {
+            background-color: #b91c1c;
+        }
+
+
+        .delete-button:disabled {
+            background-color: #94a3b8;
+
+            cursor: not-allowed;
+        }
+
+
+        .message {
+            min-height: 24px;
+
+            text-align: center;
+
+            font-weight: bold;
+
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+
+
+        .success-message {
+            color: #16a34a;
+        }
+
+
+        .error-message {
+            color: #dc2626;
+        }
+
+
+        .back-link {
+            display: block;
+
+            text-align: center;
+
+            color: #2563eb;
+
+            text-decoration: none;
+        }
+
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<main class="page-container">
+
+    <section class="player-card">
+
+        <h1>Delete Player</h1>
+
+        <p class="page-description">
+            Select the player that you want to delete
+        </p>
+
+
+        <form id="deletePlayerForm">
+
+            <div class="form-group">
+
+                <label for="playerId">
+                    Select Player
+                </label>
+
+
+                <select id="playerId" required>
+
+                    <option value="">
+                        Loading players...
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <button
+                    type="submit"
+                    id="deleteButton"
+                    class="delete-button"
+            >
+                Delete Player
+            </button>
+
+        </form>
+
+
+        <p id="message" class="message"></p>
+
+
+        <a href="/main.html" class="back-link">
+            Back To Main Page
+        </a>
+
+    </section>
+
+</main>
+
+
+<!-- JavaScript داخل نفس الملف -->
+<script>
+
+    const deletePlayerForm =
+        document.getElementById("deletePlayerForm");
+
+    const playerSelect =
+        document.getElementById("playerId");
+
+    const deleteButton =
+        document.getElementById("deleteButton");
+
+    const message =
+        document.getElementById("message");
+
+
+    /*
+       عند فتح الصفحة مباشرة،
+       شغّل function جلب اللاعبين.
+    */
+    loadPlayers();
+
+
+    /*
+       تجلب جميع اللاعبين من Spring Boot.
+    */
+    async function loadPlayers() {
+
+        playerSelect.innerHTML =
+            '<option value="">Loading players...</option>';
+
+        deleteButton.disabled = true;
+
+
+        try {
+
+            const response = await fetch("/players");
+
+
+            if (!response.ok) {
+
+                throw new Error("Failed to load players");
+
+            }
+
+
+            const players = await response.json();
+
+
+            /*
+               نمسح الاختيار القديم قبل إضافة اللاعبين.
+            */
+            playerSelect.innerHTML =
+                '<option value="">Select a player</option>';
+
+
+            /*
+               لو جدول اللاعبين فارغ.
+            */
+            if (players.length === 0) {
+
+                playerSelect.innerHTML =
+                    '<option value="">No players found</option>';
+
+                deleteButton.disabled = true;
+
+                return;
+
+            }
+
+
+            /*
+               نلف على قائمة اللاعبين.
+
+               كل لاعب سيتم وضعه داخل option.
+            */
+            players.forEach(function (player) {
+
+                const option =
+                    document.createElement("option");
+
+
+                /*
+                   value تحتوي على ID اللاعب.
+
+                   ده الـID اللي هيتبعت عند الحذف.
+                */
+                option.value = player.id;
+
+
+                /*
+                   النص الذي سيظهر للمستخدم.
+                */
+                option.textContent =
+                    "ID: " + player.id +
+                    " - Name: " + player.name;
+
+
+                playerSelect.appendChild(option);
+
+            });
+
+
+            deleteButton.disabled = false;
+
+        } catch (error) {
+
+            playerSelect.innerHTML =
+                '<option value="">Failed to load players</option>';
+
+
+            message.textContent =
+                "Error: " + error.message;
+
+
+            message.className =
+                "message error-message";
+
+
+            deleteButton.disabled = true;
+
+        }
+
+    }
+
+
+    /*
+       تعمل عند الضغط على Delete Player.
+    */
+    deletePlayerForm.addEventListener(
+        "submit",
+        async function (event) {
+
+            /*
+               منع الـForm من عمل Refresh.
+            */
+            event.preventDefault();
+
+
+            /*
+               الحصول على ID اللاعب المختار.
+            */
+            const playerId = playerSelect.value;
+
+
+            /*
+               التأكد أن المستخدم اختار لاعب.
+            */
+            if (playerId === "") {
+
+                message.textContent =
+                    "Please select a player";
+
+
+                message.className =
+                    "message error-message";
+
+
+                return;
+
+            }
+
+
+            /*
+               الحصول على اسم اللاعب الظاهر في القائمة.
+            */
+            const selectedPlayerText =
+                playerSelect.options[
+                    playerSelect.selectedIndex
+                ].textContent;
+
+
+            /*
+               إظهار رسالة تأكيد قبل الحذف.
+            */
+            const confirmDelete = confirm(
+                "Are you sure you want to delete "
+                + selectedPlayerText
+                + "?"
+            );
+
+
+            if (!confirmDelete) {
+
+                return;
+
+            }
+
+
+            message.textContent = "";
+
+            message.className = "message";
+
+            deleteButton.disabled = true;
+
+            deleteButton.textContent = "Deleting...";
+
+
+            try {
+
+                /*
+                   إرسال DELETE إلى Spring Boot.
+
+                   مثال:
+                   DELETE /players/5
+                */
+                const response = await fetch(
+                    "/players/" + playerId,
+                    {
+                        method: "DELETE"
+                    }
+                );
+
+
+                if (!response.ok) {
+
+                    const errorText =
+                        await response.text();
+
+
+                    throw new Error(
+                        errorText || "Failed to delete player"
+                    );
+
+                }
+
+
+                message.textContent =
+                    "Player deleted successfully";
+
+
+                message.className =
+                    "message success-message";
+
+
+                /*
+                   إعادة جلب اللاعبين بعد الحذف،
+                   حتى يختفي اللاعب المحذوف من القائمة.
+                */
+                await loadPlayers();
+
+            } catch (error) {
+
+                message.textContent =
+                    "Error: " + error.message;
+
+
+                message.className =
+                    "message error-message";
+
+            } finally {
+
+                deleteButton.textContent =
+                    "Delete Player";
+
+
+                /*
+                   لو القائمة تحتوي على لاعبين
+                   يتم تشغيل الزر.
+                */
+                if (playerSelect.options.length > 1) {
+
+                    deleteButton.disabled = false;
+
+                }
+
+            }
+
+        }
+    );
+
+</script>
+
+</body>
+
+</html>
